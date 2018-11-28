@@ -1,9 +1,9 @@
 # simple-interactive-interpreter-learn
 
-install
+## install
 
-npm install
+`npm install`
 
-start
+## build
 
-npm run nexe
+`npm run nexe`
