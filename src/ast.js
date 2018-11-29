@@ -12,8 +12,6 @@ const operators = { // 操作符的优先级
 const ast = (token) => { // 生成ast树
     let tokens = token.slice(); // 复制一个token的数组
     let next = null;
-    tokens.push(')');
-    tokens.unshift('(');
     while (true) {
         if(tokens.length) { // 如果tokens不为空
             next = tokens.pop(); // 从后向前扫描
@@ -42,7 +40,7 @@ const ast = (token) => { // 生成ast树
                     operatorStack.push(next);
                 }
             } else {
-                dataStack.push(next);
+                dataStack.push(Number.parseFloat(next));
             }
         } else if(operatorStack.length) { // 如果操作符栈不为空
             next = operatorStack.pop(); // 出栈

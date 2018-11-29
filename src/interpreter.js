@@ -1,4 +1,7 @@
-const { tokenizer } = require('./tokenizer');
+const {
+    tokenizer,
+    tokenizer_iterator,
+} = require('./tokenizer');
 const { ast } = require('./ast');
 const { func } = require('./func');
 const { dataStack } = require('./env');
@@ -16,13 +19,18 @@ const exe = data => {
         return data;
     }
 };
-const execute = (input) => {
+const execute = async input => {
     dataStack.pop();
-    ast(tokenizer(input));
+    await tokenizer_iterator(input)
+        .then(d => {
+            ast(d);
+            console.log(exe(...dataStack));
+        })
+        .catch(e => console.log(e));
+    // ast(tokenizer(input));
     // console.log(tokenizer(input));
     // console.log(ast(tokenizer(input)));
     // console.log(JSON.stringify(dataStack));
-    console.log(exe(...dataStack));
 };
 
 const read_line_input = process.stdin;
@@ -36,9 +44,10 @@ read_line_input.on('data', line => {
         process.stdout.write('good bye');
         process.exit();
     } else {
-        execute(line);
+        execute(line).then(() => {
+            process.stdout.write('>');
+        });
     }
-    process.stdout.write('>');
 });
 
 /* const code = '1+1';
