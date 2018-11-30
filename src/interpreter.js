@@ -1,5 +1,4 @@
 const {
-    tokenizer,
     tokenizer_iterator,
 } = require('./tokenizer');
 const { ast } = require('./ast');
@@ -20,11 +19,10 @@ const exe = data => {
     }
 };
 const execute = async input => {
-    dataStack.pop();
     await tokenizer_iterator(input)
         .then(d => {
             ast(d);
-            console.log(exe(...dataStack));
+            console.log(exe(dataStack.pop()));
         })
         .catch(e => console.log(e));
     // ast(tokenizer(input));
@@ -37,7 +35,7 @@ const read_line_input = process.stdin;
 read_line_input.setEncoding('utf-8');
 
 process.stdout.write('hello baby\n');
-process.stdout.write('>');
+process.stdout.write('> ');
 read_line_input.on('data', line => {
     // console.log(line);
     if (line.replace(/[\r\n]+/, '') === 'exit') {
@@ -45,7 +43,7 @@ read_line_input.on('data', line => {
         process.exit();
     } else {
         execute(line).then(() => {
-            process.stdout.write('>');
+            process.stdout.write('> ');
         });
     }
 });

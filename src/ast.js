@@ -40,7 +40,7 @@ const ast = (token) => { // 生成ast树
                     operatorStack.push(next);
                 }
             } else {
-                dataStack.push(Number.parseFloat(next));
+                dataStack.push(next);
             }
         } else if(operatorStack.length) { // 如果操作符栈不为空
             next = operatorStack.pop(); // 出栈
