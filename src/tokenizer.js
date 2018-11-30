@@ -1,8 +1,12 @@
 const {
+    variable
+} = require('./env');
+const {
     is_digital,
     is_punctuation,
     is_point,
     is_string,
+    is_variable,
 } = require('./type-detection');
 
 const tokenizer = input => { // 切分token
@@ -22,7 +26,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                 let num = next.value; // 存储数字
                 next = await asnycIterator.next();
                 col++;
-                while (is_digital(next.value) | is_point(next.value)) {
+                while (is_digital(next.value) || is_point(next.value)) {
                     if (is_point(next.value)) {
                         if (point_lock) {
                             while (is_point(next.value)) {
@@ -55,7 +59,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                 let start = col; // 字符串开始位置
                 col++;
                 while (next.value !== end) {
-                    if (next.done) {
+                    if (next.done) { // 如果字符串没有闭合
                         col -= start + 1;
                         while (start--) {
                             input += ' ';
@@ -64,14 +68,31 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                             input += '^';
                         }
                         throw `${input}\n SyntaxError: Invalid or unexpected token`;
+                    } else if (next.value === '\\') { // 字符串转译
+                        next = await asnycIterator.next();
+                        col++;
+                        string += next.value;
+                        next = await asnycIterator.next();
+                        col++;
+                    } else {
+                        string += next.value;
+                        next = await asnycIterator.next();
+                        col++;
                     }
-                    string += next.value;
-                    next = await asnycIterator.next();
-                    col++;
                 }
                 token.push(string);
                 next = await asnycIterator.next();
                 col++;
+                break;
+            case is_variable(next.value): // 判断变量
+                let varia = '';
+                while (is_digital(next.value) || is_variable(next.value)) {
+                    varia += next.value;
+                    next = await asnycIterator.next();
+                    col++;
+                }
+                token.push({ type: 'var', value: varia});
+                variable[varia]; // 存入变量
                 break;
             default:
                 next = await asnycIterator.next();
@@ -81,7 +102,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
     }
     return token;
 };
-// tokenizer_iterator('8.9-"90"').then(d => console.log(d)).catch(e => console.log(e));
+// tokenizer_iterator('x = 2').then(d => console.log(d)).catch(e => console.log(e));
 module.exports = {
     tokenizer,
     tokenizer_iterator,
