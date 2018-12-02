@@ -3,6 +3,7 @@ const is_punctuation = token => /[-+*\/\%=\(\)]/.test(token); // 标点符号
 const is_point = token => /[\.]/.test(token); // 点号
 const is_string = token => token === '"' || token === "'" || token === '`'; // 字符串
 const is_variable = token => /[a-zA-Z]/.test(token); // 变量
+const is_array = token => /[\[]/.test(token); // 变量
 
 module.exports = {
     is_digital,
@@ -10,4 +11,5 @@ module.exports = {
     is_point,
     is_string,
     is_variable,
+    is_array,
 };

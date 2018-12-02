@@ -7,6 +7,7 @@ const {
     is_point,
     is_string,
     is_variable,
+    is_array,
 } = require('./type-detection');
 
 const tokenizer = input => { // 切分token
@@ -45,10 +46,10 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                     col++;
                 }
                 point_lock = false;
-                token.push(Number.parseFloat(num));
+                token.push({ type: 'number', value: Number.parseFloat(num) }); // 数字型token
                 break;
             case is_punctuation(next.value): // 频道标点
-                token.push(next.value);
+                token.push({ type: 'punc', value: next.value }); // 标点型token
                 next = await asnycIterator.next();
                 col++;
                 break;
@@ -80,7 +81,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                         col++;
                     }
                 }
-                token.push(string);
+                token.push({ type: 'string', value: string });
                 next = await asnycIterator.next();
                 col++;
                 break;
@@ -94,6 +95,20 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                 token.push({ type: 'var', value: varia});
                 variable[varia]; // 存入变量
                 break;
+            case is_array(next.value): // 判断变量
+                let array = [];
+                next = await asnycIterator.next();
+                while (next.value !== ']') {
+                    if (next.value === ',') {
+                        next = await asnycIterator.next();
+                        col++;
+                    }
+                    array.push(next.value);
+                    next = await asnycIterator.next();
+                    col++;
+                }
+                token.push({ type: 'array', value: array});
+                break;
             default:
                 next = await asnycIterator.next();
                 col++;
@@ -102,7 +117,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
     }
     return token;
 };
-// tokenizer_iterator('x = 2').then(d => console.log(d)).catch(e => console.log(e));
+// tokenizer_iterator('x = "("').then(d => console.log(d)).catch(e => console.log(e));
 module.exports = {
     tokenizer,
     tokenizer_iterator,

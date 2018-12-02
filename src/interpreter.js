@@ -16,39 +16,40 @@ const exe = data => {
         if (data[2] instanceof Array) {
             data[2] = exe(data[2]);
         }
-        if (data[1] instanceof Object || data[2] instanceof Object) {
-            if(data[1].type === 'var' && data[2].type === 'var') { // 当两个数都是变量
-                if (data[0] === '=') {
-                    return func[data[0]](data[1].value, variable[data[2].value]); // 传递操作符(变量名, 变量值)
-                }
-                return func[data[0]](variable[data[1].value], variable[data[2].value]);
+        if(data[1].type === 'var' && data[2].type === 'var') { // 当两个数都是变量
+            if (data[0].type === 'punc' && data[0].value === '=') {
+                return func[data[0].value](data[1], variable[data[2].value]); // 传递操作符(变量名, 变量值)
             }
-            else if(data[1].type === 'var') { // 只有第一个数是变量
-                if (data[0] !== '=') {
-                    return func[data[0]](variable[data[1].value], data[2]); // 传递操作符(变量值, 变量名)
-                }
-                return func[data[0]](data[1].value, data[2]);
-            }
-            else if(data[2].type === 'var') { // 只有第二个数是变量
-                if (data[0] !== '=') {
-                    return func[data[0]](data[1].value, variable[data[2].value]); // 传递操作符(变量名, 变量值)
-                }
-                return func[data[0]](data[1], data[2].value);
-            }
+            return func[data[0].value](variable[data[1].value], variable[data[2].value]);
         }
-        return func[data[0]](data[1], data[2]);
+        else if(data[1].type === 'var') { // 只有第一个数是变量
+            if (data[0].type === 'punc' && data[0].value !== '=') {
+                return func[data[0].value](variable[data[1].value], data[2]); // 传递操作符(变量值, 变量名)
+            }
+            return func[data[0].value](data[1], data[2]);
+        }
+        else if(data[2].type === 'var') { // 只有第二个数是变量
+            if (data[0].type === 'punc' && data[0].value !== '=') {
+                return func[data[0].value](data[1], variable[data[2].value]); // 传递操作符(变量名, 变量值)
+            }
+            return func[data[0].value](data[1], data[2]);
+        }
+        return func[data[0].value](data[1], data[2]);
     } else if (data.type === 'var') {
-        return variable[data.value];
+        let varia = variable[data.value] === undefined // 判断变量是否存在
+            ? variable[data.value]
+            : variable[data.value].value
+        return { type: 'result', value: varia };
     } else {
-        return data;
+        return { type: 'result', value: data.value };
     }
 };
 const execute = async input => {
     await tokenizer_iterator(input)
-        .then(d => {
-            // console.log(d);
-            ast(d);
-            console.log(exe(dataStack.pop()));
+        .then(token => {
+            // console.log(token);
+            ast(token);
+            console.log(exe(dataStack.pop()).value);
         })
         .catch(e => console.log(e));
 };
@@ -56,7 +57,7 @@ const execute = async input => {
 const read_line_input = process.stdin;
 read_line_input.setEncoding('utf-8');
 
-process.stdout.write('hello baby\n');
+process.stdout.write('Hello baby.\n');
 process.stdout.write('> ');
 read_line_input.on('data', line => {
     // console.log(line);

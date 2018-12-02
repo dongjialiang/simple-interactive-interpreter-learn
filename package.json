@@ -5,17 +5,20 @@
   "main": "src/interpreter.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/interpreter.js",
     "nexe": "nexe src/interpreter.js -o djl.exe",
+    "pkg": "pkg src/interpreter.js -t node10-win-x64,node10-linux-x64,node10-macos-x64 -o pkg/djl",
     "build": "webpack --config webpack.config.js --colors --progress"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^10.12.10",
+    "@types/node": "^10.12.11",
     "nexe": "^2.0.0-rc.34",
+    "pkg": "^4.3.5",
     "ts-loader": "^5.3.1",
-    "typescript": "^3.1.6",
+    "typescript": "^3.2.1",
     "webpack": "^4.26.1",
     "webpack-cli": "^3.1.2",
     "webpack-node-externals": "^1.7.2"
