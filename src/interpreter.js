@@ -40,6 +40,11 @@ const exe = data => {
             ? variable[data.value]
             : variable[data.value].value
         return { type: 'result', value: varia };
+    } else if (data.type === 'index') {
+        if (variable[data.value] === undefined) {
+            throw `ReferenceError: ${data.value} is not defined`;
+        }
+        return { type: 'result', value: (variable[data.value].value)[data.index] };
     } else {
         return { type: 'result', value: data.value };
     }

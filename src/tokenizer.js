@@ -57,12 +57,11 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                 let end = next.value;
                 next = await asnycIterator.next();
                 let string = '';
-                let start = col; // 字符串开始位置
-                col++;
+                let start = ++col; // 字符串开始位置
                 while (next.value !== end) {
                     if (next.done) { // 如果字符串没有闭合
-                        col -= start + 1;
-                        while (start--) {
+                        col -= start;
+                        while (--start) {
                             input += ' ';
                         }
                         while (--col) {
@@ -92,7 +91,34 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                     next = await asnycIterator.next();
                     col++;
                 }
-                token.push({ type: 'var', value: varia});
+                if(is_array(next.value)) {
+                    let index = ''; // 索引值
+                    next = await asnycIterator.next();
+                    let start = ++col;
+                    while (is_digital(next.value)) {
+                        index += next.value;
+                        next = await asnycIterator.next();
+                        col++;
+                    }
+                    if (next.value === ']') {
+                        next = await asnycIterator.next();
+                        col++;
+                        token.push({ type: 'index', value: varia, index: index });
+                        break;
+                    } else {
+                        if (next.done) { // 如果字符串没有闭合
+                            col -= start;
+                            while (--start) {
+                                input += ' ';
+                            }
+                            while (--col) {
+                                input += '^';
+                            }
+                            throw `${input}\n SyntaxError: Invalid or unexpected token`;
+                        }
+                    }
+                }
+                token.push({ type: 'var', value: varia });
                 variable[varia]; // 存入变量
                 break;
             case is_array(next.value): // 判断变量
@@ -117,7 +143,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
     }
     return token;
 };
-// tokenizer_iterator('x = "("').then(d => console.log(d)).catch(e => console.log(e));
+// tokenizer_iterator('x[1"2]').then(d => console.log(d)).catch(e => console.log(e));
 module.exports = {
     tokenizer,
     tokenizer_iterator,
