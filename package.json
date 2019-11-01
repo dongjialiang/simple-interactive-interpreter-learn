@@ -5,13 +5,19 @@
   "main": "src/interpreter.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/interpreter.js"
+    "start": "node src/interpreter.js",
+    "build": "webpack --config webpack.config.js --progress --colors",
+    "watch": "webpack --config webpack.config.js --progress --colors --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^10.14.16",
-    "typescript": "^3.5.3"
+    "@types/node": "^12.12.3",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.6.4",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-node-externals": "^1.7.2"
   }
 }
