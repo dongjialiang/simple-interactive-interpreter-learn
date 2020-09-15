@@ -2,22 +2,25 @@
   "name": "simple-interactive-interpreter-learn",
   "version": "0.0.1",
   "description": "",
-  "main": "src/interpreter.js",
+  "main": "dist/interpreter.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/interpreter.js",
-    "build": "webpack --config webpack.config.js --progress --colors",
-    "watch": "webpack --config webpack.config.js --progress --colors --watch"
+    "build": "tsc",
+    "dev": "nodemon -e ts,tsx --exec ts-node ./src/interpreter.ts",
+    "start": "node ./dist/interpreter.js"
+  },
+  "bin": {
+    "siil": "./dist/interpreter.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^12.12.35",
-    "ts-loader": "^6.2.2",
-    "typescript": "^3.8.3",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "webpack-node-externals": "^1.7.2"
+    "@types/node": "^12.12.58",
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0"
   }
 }

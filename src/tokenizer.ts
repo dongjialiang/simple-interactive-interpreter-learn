@@ -9,16 +9,15 @@ import {
 } from "./type-detection";
 
 const tokenizer = input => { // 切分token
-    return input.split(/\s*(=|[-+*\/\%=\(\)]|[0-9]*\.?[0-9]+)\s*/).filter((d) => !d.match(/^\s*$/));
+    return input.split(/\s*(=|[-+*\/\%=\(\)]|[0-9]*\.?[0-9]+)\s*/).filter((d: string) => !d.match(/^\s*$/));
 };
 
-const tokenizer_iterator = async input => { // 使用迭代器切分token
+const tokenizer_iterator = async (input: string) => { // 使用迭代器切分token
     const asnycIterator = input[Symbol.iterator]();
     const token = []; // 存储token
     let next = await asnycIterator.next();
     let col = 0; // 保存列数
-    while(!next.done) {
-        // console.log(/[0-9]/.test(next.value));
+    while (!next.done) {
         switch (true) {
             case is_digital(next.value): // 判断数字
                 let point_lock = false; // 小数点的锁
@@ -89,7 +88,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                     next = await asnycIterator.next();
                     col++;
                 }
-                if(is_array(next.value)) {
+                if (is_array(next.value)) {
                     let index = ''; // 索引值
                     next = await asnycIterator.next();
                     let start = ++col;
@@ -131,7 +130,7 @@ const tokenizer_iterator = async input => { // 使用迭代器切分token
                     next = await asnycIterator.next();
                     col++;
                 }
-                token.push({ type: 'array', value: array});
+                token.push({ type: 'array', value: array });
                 break;
             default:
                 next = await asnycIterator.next();

@@ -1,7 +1,8 @@
-import { tokenizer, tokenizer_iterator } from './tokenizer';
+import { tokenizer_iterator } from './tokenizer';
 import { ast } from './ast';
 import { func } from './func';
 import { dataStack, variable } from './env';
+import { red } from 'chalk';
 
 const exe = data => {
     if (data instanceof Array) { // 如果数据为数组
@@ -44,36 +45,24 @@ const exe = data => {
         return { type: 'result', value: data.value };
     }
 };
-const execute = async input => {
-    await tokenizer_iterator(input)
-        .then(token => {
-            // console.log(token);
-            ast(token);
-            console.log(exe(dataStack.pop()).value);
-        })
-        .catch(e => console.log(e));
-};
 
+const execute = async input => {
+    const token = await tokenizer_iterator(input);
+    ast(token);
+    process.stdout.write(`${red(exe(dataStack.pop()).value)}\n`);
+};
+/* 读一行输入 */
 const read_line_input = process.stdin;
 read_line_input.setEncoding('utf-8');
-
+/* 输出开始语句 */
 process.stdout.write('Hello baby.\n');
 process.stdout.write('> ');
-read_line_input.on('data', line => {
-    // console.log(line);
-    if (line.toString().replace(/[\r\n]+/, '') === '.exit') { // 修改退出方法
+/* 处理输入语句 */
+read_line_input.on('data', async line => {
+    if (line.toString().replace(/[\r\n]+/, '') === '.exit') { // 匹配退出方法
         process.stdout.write('good bye');
         process.exit();
-    } else {
-        execute(line).then(() => {
-            process.stdout.write('> ');
-        });
     }
+    await execute(line); // 等待操作完毕
+    process.stdout.write('> ');
 });
-
-/* const code = '1+1';
-execute(code);
-execute('1 + 1');
-execute('1 + 1 ');
-execute('18.69 + 1 ');
-execute('18.69 + 2 * (5 * 4 + 1 ) / 21 - 5'); */
